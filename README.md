@@ -25,7 +25,7 @@ src/hypergraphpercol/   # Python package
 1. Clone this repository and the CGAL helper executables:
 
    ```bash
-   git clone https://github.com/your-user/HypergraphPercol.git
+   git clone https://github.com/Ludwig-H/HypergraphPercol.git
    cd HypergraphPercol
    python -m venv .venv && source .venv/bin/activate
    pip install -U pip
