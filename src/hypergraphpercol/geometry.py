@@ -22,6 +22,7 @@ def bary_weight_one(
 ) -> float:
     if _cython_bary_weight_one is not None:
         return float(_cython_bary_weight_one(M, s2_all, idx, out_q))
+    print("Warning: no cython module bary_weight_one. Python fallback.")
     idx_arr = np.asarray(idx, dtype=np.int64)
     points = M[idx_arr]
     np.copyto(out_q, points.mean(axis=0))
@@ -39,6 +40,7 @@ def bary_weight_batch(
     if _cython_bary_weight_batch is not None:
         _cython_bary_weight_batch(M, s2_all, combos, out_Q, out_w)
         return
+    print("Warning: no cython module bary_weight_batch. Python fallback.")
     for i, combo in enumerate(combos):
         points = M[combo]
         mean = points.mean(axis=0)
@@ -49,6 +51,7 @@ def bary_weight_batch(
 def union_if_adjacent_int(a: np.ndarray, b: np.ndarray, out_u: np.ndarray) -> bool:
     if _cython_union_if_adjacent_int is not None:
         return bool(_cython_union_if_adjacent_int(a, b, out_u))
+    print("Warning: no cython module union_if_adjacent_int. Python fallback.")
     i = j = u = 0
     k = a.shape[0]
     while i < k and j < k:
