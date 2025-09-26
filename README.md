@@ -27,8 +27,6 @@ src/hypergraphpercol/   # Python package
    ```bash
    git clone https://github.com/Ludwig-H/HypergraphPercol.git
    cd HypergraphPercol
-   python -m venv .venv && source .venv/bin/activate
-   pip install -U pip
    pip install -e .
    ./scripts/setup_cgal.py
    ```
