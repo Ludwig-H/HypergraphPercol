@@ -131,7 +131,7 @@ def HypergraphPercol(
     dim_reducer: bool | str = False,
     threshold_variance_dim_reduction: float = 0.999,
     verbeux: bool = False,
-    cgal_root: str | os.PathLike[str] | None = None,
+    cgal_root: str | os.PathLike[str] | None = "/content/HypergraphPercol/CGALDelaunay",
 ) -> np.ndarray | tuple[np.ndarray, list[list[tuple[int, float, float]]]]:
     n, d = M.shape
     M = np.ascontiguousarray(M, dtype=np.float64)
