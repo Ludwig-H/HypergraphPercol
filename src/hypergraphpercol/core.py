@@ -28,7 +28,7 @@ def _build_graph_KSimplexes(
     expZ: float,
     precision: str = "safe",
     verbose: bool = False,
-    cgal_root: str | os.PathLike[str] | None = None,
+    cgal_root: str | os.PathLike[str] | None = "../../CGALDelaunay",
 ) -> tuple[list[list[int]], list[int], list[int], list[float], int]:
     if min_samples is None or min_samples <= K:
         min_samples = K + 1
