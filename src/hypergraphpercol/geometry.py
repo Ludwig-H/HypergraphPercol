@@ -9,6 +9,7 @@ try:  # pragma: no cover - prefer compiled implementations
         union_if_adjacent_int as _cython_union_if_adjacent_int,
     )
 except ImportError:  # pragma: no cover - fallback used when extension unavailable
+    print("Warning: no cython modules for bary_weight_batch, bary_weight_one and. Python fallback.")
     _cython_bary_weight_one = None
     _cython_bary_weight_batch = None
     _cython_union_if_adjacent_int = None
