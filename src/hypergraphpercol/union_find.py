@@ -10,6 +10,7 @@ except ImportError:  # pragma: no cover - fallback used when extension unavailab
     print("Warning: no cython module UnionFind. Python fallback.")
     class _CythonUnionFind:  # type: ignore[too-many-ancestors]
         def __init__(self, size: int) -> None:
+            print("Warning: no cython module UnionFind. Python fallback.")
             if size < 0:
                 raise ValueError("size must be non-negative")
             self.parent = np.arange(size, dtype=np.int64)
