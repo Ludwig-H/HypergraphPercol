@@ -22,25 +22,58 @@ src/hypergraphpercol/   # Python package
 
 ## Installation
 
-1. Clone this repository and the CGAL helper executables:
+The commands below describe the exact sequence used to validate the repository in the development container. Adjust the package
+manager commands for your platform as needed.
+
+1. **Clone the repository and install the Python package in editable mode.**
 
    ```bash
    git clone https://github.com/Ludwig-H/HypergraphPercol.git
    cd HypergraphPercol
+   python -m venv .venv
+   source .venv/bin/activate
+   pip install --upgrade pip
    pip install -e .
+   ```
+
+2. **Download the CGAL helper repositories.**
+
+   ```bash
    ./scripts/setup_cgal.py
    ```
 
-   The helper script clones the six repositories containing the prebuilt CGAL executables into `CGALDelaunay/`. If you already have them, place them in that directory or set the `CGALDELAUNAY_ROOT` environment variable to point to their location.
+   This script clones six helper projects into `CGALDelaunay/`. If you already have them locally, place them in that directory
+   or point the `CGALDELAUNAY_ROOT` environment variable to their location.
 
-   > **Note**
-   > The editable install step compiles a small Cython extension that accelerates key geometric routines. Ensure a C/C++ toolchain and Python headers are available on your platform.
+3. **Install the system packages required to compile the helpers.**
 
-2. Install optional extras (if you need UMAP-based dimensionality reduction):
+   ```bash
+   sudo apt-get update
+   sudo apt-get install -y build-essential cmake libcgal-dev libtbb-dev libtbbmalloc2 libgmp-dev libmpfr-dev libeigen3-dev
+   ```
+
+4. **Build each helper project.**
+
+   ```bash
+   for project in CGALDelaunay/*; do
+       [ -d "$project" ] || continue
+       cmake -S "$project" -B "$project/build" -DCMAKE_BUILD_TYPE=Release
+       cmake --build "$project/build" -j
+   done
+   ```
+
+   The loop above is equivalent to running the `cmake` configure/build commands in each helper directory (e.g. `EdgesCGAL1D`,
+   `EdgesCGAL2D`, …). You can also execute the commands manually if you prefer.
+
+5. **Install optional extras** (only required for the UMAP dimensionality reduction pipeline):
 
    ```bash
    pip install umap-learn
    ```
+
+> **Note**
+> The editable install step compiles a small Cython extension that accelerates key geometric routines. Ensure a C/C++ toolchain
+> and Python headers are available on your platform.
 
 ## Usage
 

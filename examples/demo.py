@@ -22,13 +22,28 @@ def main() -> None:
     data = make_dataset()
     repo_root = pathlib.Path(__file__).resolve().parents[1]
     cgal_root = repo_root / "CGALDelaunay"
+
+    # Prefer CGAL-based complexes when the helper binaries are available.
+    # This keeps the example runnable in environments where the CGAL
+    # repositories have not been cloned/built yet (e.g. CI containers).
+    default_complex = "auto"
+    helper_binary = (
+        cgal_root
+        / "EdgesCGALDelaunay2D"
+        / "build"
+        / "EdgesCGALDelaunay2D"
+    )
+    if not helper_binary.exists():
+        default_complex = "rips"
+        cgal_root = None
+
     labels = HypergraphPercol(
         data,
         K=2,
         min_cluster_size=20,
         min_samples=4,
         metric="euclidean",
-        complex_chosen="auto",
+        complex_chosen=default_complex,
         expZ=2,
         precision="safe",
         verbeux=False,
