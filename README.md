@@ -1,6 +1,6 @@
 # HypergraphPercol
 
-HypergraphPercol is a research-grade clustering algorithm based on hypergraph percolation. This repository turns the original research notebook into a reusable Python package with a reproducible project layout, documentation, and examples.
+HypergraphPercol is a research-grade clustering algorithm based on hypergraph percolation.
 
 ## Features
 
