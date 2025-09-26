@@ -7,6 +7,7 @@ import numpy as np
 try:  # pragma: no cover - exercised via compiled extension
     from ._cython import UnionFind as _CythonUnionFind  # type: ignore
 except ImportError:  # pragma: no cover - fallback used when extension unavailable
+    print("Warning: no cython module UnionFind. Python fallback.")
     class _CythonUnionFind:  # type: ignore[too-many-ancestors]
         def __init__(self, size: int) -> None:
             if size < 0:
