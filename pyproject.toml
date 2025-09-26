@@ -25,10 +25,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-umap = ["umap-learn>=0.5"]
+umap = ["umap-learn"]
 
 [project.urls]
-Homepage = "https://github.com/your-user/HypergraphPercol"
+Homepage = "https://github.com/Ludwig-H/HypergraphPercol"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
