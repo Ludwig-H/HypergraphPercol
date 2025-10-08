@@ -59,7 +59,7 @@ def _build_graph_KSimplexes(
                 _, radius_sq = minimum_enclosing_ball(pts)
                 return radius_sq
 
-            radii_sq = Parallel(n_jobs=N_CPU, prefer="processes")(
+            radii_sq = Parallel(n_jobs=-1, prefer="processes")(
                 delayed(_sqr_radius)(s) for s in simplexes
             )
             if expZ != 2:
