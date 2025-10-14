@@ -74,6 +74,9 @@ manager commands for your platform as needed.
 > **Note**
 > The editable install step compiles a small Cython extension that accelerates key geometric routines. Ensure a C/C++ toolchain
 > and Python headers are available on your platform.
+>
+> `cyminiball`—used for minimum enclosing ball computations—has not yet been updated for NumPy 2.x. The project metadata pins
+> `numpy<2.0`, so make sure your environment does not force-install a newer NumPy release before installing HypergraphPercol.
 
 ## Usage
 
