@@ -7,7 +7,7 @@ HypergraphPercol is a research-grade clustering algorithm based on hypergraph pe
 - Weighted Delaunay / order-k Delaunay support via CGAL helper binaries
 - Integration with HDBSCAN for hierarchical cluster extraction
 - Optional PCA / UMAP dimensionality reduction pipeline
-- Parallel radius computation using [`miniball`](https://pypi.org/project/MiniballCpp/)
+- Parallel radius computation using [`cyminiball`](https://pypi.org/project/cyminiball/)
 - Example script showing end-to-end usage on synthetic data
 
 ## Project layout

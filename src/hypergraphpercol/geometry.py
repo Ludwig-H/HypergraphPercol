@@ -2,6 +2,11 @@ from __future__ import annotations
 
 import numpy as np
 
+try:
+    import cyminiball as _CYMINIBALL  # type: ignore
+except Exception as exc:  # pragma: no cover - hard failure, dependency required
+    raise ImportError("cyminiball is required for minimum_enclosing_ball") from exc
+
 try:  # pragma: no cover - prefer compiled implementations
     from ._cython import (  # type: ignore
         bary_weight_batch as _cython_bary_weight_batch,
@@ -91,10 +96,11 @@ def minimum_enclosing_ball(points_sub: np.ndarray) -> tuple[np.ndarray, float]:
     if points_sub.shape[0] == 2:
         diff = points_sub[0] - points_sub[1]
         return 0.5 * (points_sub[0] + points_sub[1]), float(np.dot(diff, diff)) * 0.25
-    import miniball
 
-    ball = miniball.Miniball(points_sub)
-    return np.asarray(ball.center(), dtype=np.float64), float(ball.squared_radius())
+    ball = _CYMINIBALL.Miniball(points_sub)
+    center = np.asarray(ball.center(), dtype=np.float64)
+    radius_sq = float(ball.squared_radius())
+    return center, radius_sq
 
 
 def kth_radius(M: np.ndarray, k: int, metric: str, precomputed: bool) -> np.ndarray:
