@@ -25,7 +25,7 @@ src/hypergraphpercol/   # Python package
 The commands below describe the exact sequence used to validate the repository in the development container. Adjust the package
 manager commands for your platform as needed.
 
-1. **Clone the repository and install the Python package in editable mode.**
+1. **Clone the repository and prepare a virtual environment.**
 
    ```bash
    git clone https://github.com/Ludwig-H/HypergraphPercol.git
@@ -33,10 +33,30 @@ manager commands for your platform as needed.
    python -m venv .venv
    source .venv/bin/activate
    pip install --upgrade pip
+   ```
+
+2. **Build and install `cyminiball` from source.**
+
+   The PyPI sdist of `cyminiball` ships generated C++ bindings that no longer
+   compile on modern Python/NumPy combinations. The helper script below clones
+   the upstream repository, cythonises the bindings and installs the fresh
+   build into the current environment:
+
+   ```bash
+   ./scripts/build_cyminiball.sh
+   ```
+
+   Re-run the script to update to a newer commit or point the
+   `CYMINIBALL_REF`/`CYMINIBALL_REPO` environment variables at an alternative
+   revision.
+
+3. **Install HypergraphPercol in editable mode.**
+
+   ```bash
    pip install -e .
    ```
 
-2. **Download the CGAL helper repositories.**
+4. **Download the CGAL helper repositories.**
 
    ```bash
    ./scripts/setup_cgal.py
@@ -45,14 +65,14 @@ manager commands for your platform as needed.
    This script clones six helper projects into `CGALDelaunay/`. If you already have them locally, place them in that directory
    or point the `CGALDELAUNAY_ROOT` environment variable to their location.
 
-3. **Install the system packages required to compile the helpers.**
+5. **Install the system packages required to compile the helpers.**
 
    ```bash
    sudo apt-get update
    sudo apt-get install -y build-essential cmake libcgal-dev libtbb-dev libtbbmalloc2 libgmp-dev libmpfr-dev libeigen3-dev
    ```
 
-4. **Build each helper project.**
+6. **Build each helper project.**
 
    ```bash
    for project in CGALDelaunay/*; do
@@ -65,7 +85,7 @@ manager commands for your platform as needed.
    The loop above is equivalent to running the `cmake` configure/build commands in each helper directory (e.g. `EdgesCGAL1D`,
    `EdgesCGAL2D`, …). You can also execute the commands manually if you prefer.
 
-5. **Install optional extras** (only required for the UMAP dimensionality reduction pipeline):
+7. **Install optional extras** (only required for the UMAP dimensionality reduction pipeline):
 
    ```bash
    pip install umap-learn
@@ -75,8 +95,9 @@ manager commands for your platform as needed.
 > The editable install step compiles a small Cython extension that accelerates key geometric routines. Ensure a C/C++ toolchain
 > and Python headers are available on your platform.
 >
-> `cyminiball`—used for minimum enclosing ball computations—has not yet been updated for NumPy 2.x. The project metadata pins
-> `numpy<2.0`, so make sure your environment does not force-install a newer NumPy release before installing HypergraphPercol.
+> `scripts/build_cyminiball.sh` installs the upstream `cyminiball` sources with
+> a local Cython build so that Python 3.10+ and NumPy 2.x environments remain
+> compatible. The project metadata now tracks those relaxed constraints.
 
 ## Usage
 
