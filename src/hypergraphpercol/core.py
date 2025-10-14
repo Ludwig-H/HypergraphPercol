@@ -17,7 +17,7 @@ from .geometry import kth_radius, minimum_enclosing_ball
 from .union_find import UnionFind
 
 N_CPU = max(1, os.cpu_count() or 1)
-
+N_CPU_dispo = max(1, N_CPU//8) # On parallélise x8 avec CGAL
 
 def _build_graph_KSimplexes(
     M: np.ndarray,
@@ -58,10 +58,11 @@ def _build_graph_KSimplexes(
                 pts = M[np.asarray(simplex, dtype=np.int64)]
                 _, radius_sq = minimum_enclosing_ball(pts)
                 return radius_sq
-
-            radii_sq = Parallel(n_jobs=-1, prefer="processes")(
+            radii_sq = Parallel(n_jobs=N_CPU_dispo, prefer="processes")(
                 delayed(_sqr_radius)(s) for s in simplexes
             )
+            if verbose:
+                print("N_CPU_dispo utilisés : ", N_CPU_dispo)
             if expZ != 2:
                 radii_sq = np.asarray(radii_sq, dtype=np.float64) ** (expZ / 2)
             Simplexes = [(list(s), float(radii_sq[i])) for i, s in enumerate(simplexes)]
