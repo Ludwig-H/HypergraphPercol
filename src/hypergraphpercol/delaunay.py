@@ -67,7 +67,7 @@ def edges_from_weighted_delaunay(points: np.ndarray, weights: np.ndarray | None 
         env = os.environ.copy()
         if precision == "exact":
             env["CGAL_EXACT_PREDICATES"] = "1"
-        env["CGAL_NTHREADS"] = NB_THREADS_CGAL   # threads TBB pour CGAL
+        env["CGAL_NTHREADS"] = str(NB_THREADS_CGAL)   # threads TBB pour CGAL
         # par prudence, évite la double-parallélisation ailleurs
         env["OMP_NUM_THREADS"] = "1"
         env["MKL_NUM_THREADS"] = "1"
