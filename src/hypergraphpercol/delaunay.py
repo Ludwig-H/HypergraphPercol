@@ -9,6 +9,7 @@ import numpy as np
 
 from .geometry import bary_weight_batch, union_if_adjacent_int
 
+NB_THREADS_CGAL = 8 # Au delà, les performances s'aplatissent
 
 def unique_sorted_rows(arr: np.ndarray, *, sort_rows: bool = False) -> np.ndarray:
     a = np.asarray(arr, dtype=np.int64)
@@ -66,6 +67,11 @@ def edges_from_weighted_delaunay(points: np.ndarray, weights: np.ndarray | None 
         env = os.environ.copy()
         if precision == "exact":
             env["CGAL_EXACT_PREDICATES"] = "1"
+        env["CGAL_NTHREADS"] = NB_THREADS_CGAL   # threads TBB pour CGAL
+        # par prudence, évite la double-parallélisation ailleurs
+        env["OMP_NUM_THREADS"] = "1"
+        env["MKL_NUM_THREADS"] = "1"
+        env["OPENBLAS_NUM_THREADS"] = "1"
         subprocess.run(cmd, check=True, env=env)
         edges = np.load(output_file)
     edges = np.asarray(edges, dtype=np.int64)
