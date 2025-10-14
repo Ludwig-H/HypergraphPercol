@@ -21,7 +21,7 @@ dependencies = [
   "joblib",
   "hdbscan",
   "gudhi",
-  "MiniballCpp",
+  "cyminiball",
 ]
 
 [project.optional-dependencies]
