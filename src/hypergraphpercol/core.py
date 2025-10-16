@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Iterable, Sequence
 
 import numpy as np
-from joblib import Parallel, delayed
+from joblib import Parallel, delayed, cpu_count
 from sklearn.decomposition import PCA
 from sklearn.metrics import pairwise_distances
 
@@ -18,6 +18,9 @@ from .union_find import UnionFind
 
 N_CPU = max(1, os.cpu_count() or 1)
 N_CPU_dispo = -1 # min(8, N_CPU) # On parallélise x1 ou x8 avec CGAL
+
+os.environ["LOKY_MAX_CPU_COUNT"] = str(cpu_count(only_physical_cores=True))
+
 
 def _build_graph_KSimplexes(
     M: np.ndarray,
