@@ -9,7 +9,7 @@ import numpy as np
 
 from .geometry import bary_weight_batch, union_if_adjacent_int
 
-NB_THREADS_CGAL = 8 # Au delà, les performances s'aplatissent
+NB_THREADS_CGAL = 1 # Au delà de 8, les performances s'aplatissent
 
 def unique_sorted_rows(arr: np.ndarray, *, sort_rows: bool = False) -> np.ndarray:
     a = np.asarray(arr, dtype=np.int64)
