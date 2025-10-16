@@ -17,7 +17,7 @@ from .geometry import kth_radius, minimum_enclosing_ball
 from .union_find import UnionFind
 
 N_CPU = max(1, os.cpu_count() or 1)
-N_CPU_dispo = min(8, N_CPU) # On parallélise x8 avec CGAL
+N_CPU_dispo = -1 # min(8, N_CPU) # On parallélise x1 ou x8 avec CGAL
 
 def _build_graph_KSimplexes(
     M: np.ndarray,
