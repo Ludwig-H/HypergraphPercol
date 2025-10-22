@@ -57,8 +57,8 @@ def edges_from_weighted_delaunay(points: np.ndarray, weights: np.ndarray | None 
     binary = _resolve_cgal_binary(dimension, weights_arr is not None, root_dir)
     with tempfile.TemporaryDirectory() as tmp:
         tmp_path = Path(tmp)
-        points_file = tmp_path / "points"+str(n_points)+".npy"
-        output_file = tmp_path / "edges"+str(n_points)+".npy"
+        points_file = tmp_path / f"points{n_points}.npy"
+        output_file = tmp_path / f"edges{n_points}.npy"
         np.save(points_file, points)
         cmd: list[str] = [str(binary), str(points_file), str(output_file)]
         if weights_arr is not None:
