@@ -143,7 +143,7 @@ def HypergraphPercol(
         min_cluster_size = round(math.sqrt(n))
     X = np.copy(M)
     pre = metric == "precomputed"
-    delaunay_possible = not pre and metric == "euclidean" and M.ndim == 2 and M.shape[0] != M.shape[1]
+    delaunay_possible = not pre and metric == "euclidean" and M.ndim == 2 
     if min_samples is None or min_samples <= K:
         min_samples = K + 1
     if str(dim_reducer).lower() in {"pca", "umap"} and delaunay_possible:
