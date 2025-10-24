@@ -146,6 +146,8 @@ def HypergraphPercol(
     delaunay_possible = not pre and metric == "euclidean" and M.ndim == 2 
     if min_samples is None or min_samples <= K:
         min_samples = K + 1
+    if M.shape[0] > 0:
+        min_samples = min(min_samples, M.shape[0])
     if str(dim_reducer).lower() in {"pca", "umap"} and delaunay_possible:
         pca = PCA(n_components=threshold_variance_dim_reduction, svd_solver="full", whiten=False)
         X2 = pca.fit_transform(M)
