@@ -36,7 +36,7 @@ def _build_graph_KSimplexes(
     if min_samples is None or min_samples <= K:
         min_samples = K + 1
     pre = metric == "precomputed"
-    delaunay_possible = not pre and metric == "euclidean" and M.ndim == 2 and M.shape[0] != M.shape[1]
+    delaunay_possible = not pre and metric == "euclidean" and M.ndim == 2
     n, d = M.shape
     if complex_chosen.lower() not in {"orderk_delaunay", "delaunay", "rips"}:
         if not delaunay_possible:
