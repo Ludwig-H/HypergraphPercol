@@ -132,6 +132,31 @@ Run the demo script to build a synthetic dataset and cluster it:
 python examples/demo.py
 ```
 
+## Google Colab build notebook
+
+If you prefer building the full stack inside a managed environment, open [`hgp-compil.ipynb`](./hgp-compil.ipynb) in Google Colab (``File → Open notebook → GitHub`` and paste the repository URL, or use the Colab badge below). The notebook mirrors the Dockerfile you provided:
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Ludwig-H/HypergraphPercol/blob/main/hgp-compil.ipynb)
+
+1. Installs the required system packages (`libcgal-dev`, `libtbb-dev`, `libboost-all-dev`, …).
+2. Clones both `HypergraphPercol` and the `cyminiball` dependency at runtime.
+3. Builds `cyminiball`, patches the CGAL helper projects for pthread linkage, and compiles every helper binary.
+4. Installs the freshly built wheel so that calling `HypergraphPercol(...)` works inside the notebook session.
+
+After the build cells complete, the final validation cell performs a quick clustering run to confirm that `HypergraphPercol` is usable from the notebook.
+
+### Verifying the build locally
+
+The hosted Colab runtime currently ships with Python 3.10, but newer desktop distributions (including the automated checks run for this repository) already use Python 3.12. When reproducing the pipeline locally with Python 3.12 you must ensure that `pip` reuses the `cyminiball` wheel built earlier in the process. The easiest way to do so is to install the runtime dependencies first and then install HypergraphPercol with `--no-deps`:
+
+```bash
+# build the CGAL helpers following the notebook instructions, then run
+python3 -m pip install --upgrade scikit-learn hdbscan gudhi joblib threadpoolctl
+python3 -m pip install --no-deps --force-reinstall .
+```
+
+This sequence avoids re-invoking the `cyminiball` build step, which fails under Python 3.12 due to upstream API changes, while still producing a working installation of HypergraphPercol.
+
 ## Testing
 
 You can verify the installation with the included unit tests:
