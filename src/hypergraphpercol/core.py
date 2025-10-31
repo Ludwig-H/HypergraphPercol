@@ -33,12 +33,27 @@ def _build_graph_KSimplexes(
     verbose: bool = False,
     cgal_root: str | os.PathLike[str] | None = "../../CGALDelaunay",
 ) -> tuple[list[list[int]], list[int], list[int], list[float], int]:
+    is_sparse_metric = metric == "sparse"
+    if is_sparse_metric:
+        M = np.asarray(M, dtype=np.float64)
+        if M.ndim != 2 or M.shape[1] != 3:
+            raise ValueError("For metric='sparse', M must be a list/array of (i, j, distance) triplets.")
+        if M.size:
+            n_points = int(np.max(M[:, :2])) + 1
+        else:
+            n_points = 0
+        d = 0
+    else:
+        M = np.ascontiguousarray(M, dtype=np.float64)
+        n_points, d = M.shape
     if min_samples is None or min_samples <= K:
         min_samples = K + 1
     pre = metric == "precomputed"
-    delaunay_possible = not pre and metric == "euclidean" and M.ndim == 2
-    n, d = M.shape
-    if complex_chosen.lower() not in {"orderk_delaunay", "delaunay", "rips"}:
+    delaunay_possible = not pre and metric == "euclidean" and not is_sparse_metric and M.ndim == 2
+    n = n_points
+    if is_sparse_metric:
+        complex_chosen = "rips"
+    elif complex_chosen.lower() not in {"orderk_delaunay", "delaunay", "rips"}:
         if not delaunay_possible:
             complex_chosen = "rips"
         else:
@@ -72,28 +87,49 @@ def _build_graph_KSimplexes(
     else:
         import gudhi
 
-        r = kth_radius(M, min_samples - 1, metric, pre)
-        r2 = r**2
-        if complex_chosen.lower() == "rips":
-            r2 = r
+        if is_sparse_metric:
             expZ_local = expZ * 2
-            if precision == "exact":
-                mx = 2 * np.quantile(r, 0.99)
-            else:
-                mx = (1 + 1 / math.sqrt(d)) * np.quantile(r, 0.99)
-            if pre or metric != "euclidean":
-                D = M if pre else pairwise_distances(M, metric=metric)
-                st = gudhi.RipsComplex(distance_matrix=D, max_edge_length=mx).create_simplex_tree(max_dimension=K)
-            else:
-                st = gudhi.RipsComplex(points=M, max_edge_length=mx).create_simplex_tree(max_dimension=K)
+            r2 = np.zeros(n, dtype=np.float64)
+            st = gudhi.SimplexTree()
+            for v in range(n):
+                st.insert([int(v)], filtration=0.0)
+            for i, j, dist in M:
+                ii = int(i)
+                jj = int(j)
+                filt = float(dist)
+                if ii == jj:
+                    continue
+                if jj < ii:
+                    ii, jj = jj, ii
+                st.insert([ii, jj], filtration=filt)
+            if n:
+                st.expansion(max_dimension=K)
         else:
-            expZ_local = expZ
-            st = gudhi.DelaunayCechComplex(points=M).create_simplex_tree()
+            r = kth_radius(M, min_samples - 1, metric, pre)
+            r2 = r**2
+            if complex_chosen.lower() == "rips":
+                r2 = r
+                expZ_local = expZ * 2
+                if precision == "exact":
+                    mx = 2 * np.quantile(r, 0.99)
+                else:
+                    mx = (1 + 1 / math.sqrt(d)) * np.quantile(r, 0.99)
+                if pre or metric != "euclidean":
+                    D = M if pre else pairwise_distances(M, metric=metric)
+                    st = gudhi.RipsComplex(distance_matrix=D, max_edge_length=mx).create_simplex_tree(max_dimension=K)
+                else:
+                    st = gudhi.RipsComplex(points=M, max_edge_length=mx).create_simplex_tree(max_dimension=K)
+            else:
+                expZ_local = expZ
+                st = gudhi.DelaunayCechComplex(points=M).create_simplex_tree()
         for simplex, filt in st.get_skeleton(K):
             if len(simplex) != K + 1:
                 continue
             simplex = list(sorted(simplex))
-            max_kth_radius2 = max(r2[p] for p in simplex)
+            if is_sparse_metric:
+                max_kth_radius2 = 0.0
+            else:
+                max_kth_radius2 = max(r2[p] for p in simplex)
             filt = max(filt, max_kth_radius2)
             if expZ_local != 2:
                 filt = filt ** (expZ_local / 2)
@@ -137,18 +173,29 @@ def HypergraphPercol(
     verbeux: bool = False,
     cgal_root: str | os.PathLike[str] | None = "/content/HypergraphPercol/CGALDelaunay",
 ) -> np.ndarray | tuple[np.ndarray, list[list[tuple[int, float, float]]]]:
-    n, d = M.shape
-    M = np.ascontiguousarray(M, dtype=np.float64)
+    is_sparse_metric = metric == "sparse"
+    if is_sparse_metric:
+        M = np.asarray(M, dtype=np.float64)
+        if M.ndim != 2 or M.shape[1] != 3:
+            raise ValueError("For metric='sparse', M must be provided as (i, j, distance) triplets.")
+        if M.size:
+            n = int(np.max(M[:, :2])) + 1
+        else:
+            n = 0
+        d = 0
+    else:
+        M = np.ascontiguousarray(M, dtype=np.float64)
+        n, d = M.shape
     if min_cluster_size is None:
         min_cluster_size = round(math.sqrt(n))
     X = np.copy(M)
     pre = metric == "precomputed"
-    delaunay_possible = not pre and metric == "euclidean" and M.ndim == 2 
+    delaunay_possible = not pre and metric == "euclidean" and not is_sparse_metric and M.ndim == 2
     if min_samples is None or min_samples <= K:
         min_samples = K + 1
-    if M.shape[0] > 0:
-        min_samples = min(min_samples, M.shape[0])
-    if str(dim_reducer).lower() in {"pca", "umap"} and delaunay_possible:
+    if n > 0:
+        min_samples = min(min_samples, n)
+    if not is_sparse_metric and str(dim_reducer).lower() in {"pca", "umap"} and delaunay_possible:
         pca = PCA(n_components=threshold_variance_dim_reduction, svd_solver="full", whiten=False)
         X2 = pca.fit_transform(M)
         r = pca.n_components_
@@ -178,7 +225,7 @@ def HypergraphPercol(
     if verbeux:
         print(f"{K}-simplices={nS}")
     if not faces_raw:
-        if K > d:
+        if not is_sparse_metric and K > d:
             print("Warning: K too high compared to the dimension of the data. No clustering possible with such a K.")
         if return_multi_clusters:
             return np.full(n, -1, dtype=np.int64), [(-1, 1.0, 1.0)] * n
